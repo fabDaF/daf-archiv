@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kausale und konsekutive Konnektoren</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #1a1a2e; min-height: 100vh; }
+
+/* Header */
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 20px 16px; text-align: center; }
+.header h1 { font-size: 1.5em; margin-bottom: 4px; }
+.header h2 { font-size: 1em; font-weight: 400; opacity: 0.9; }
+
+/* Navigation */
+.nav { display: flex; flex-wrap: nowrap; background: #f8f9fa; border-top: 1px solid #ddd; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }
+
+
+
+
+/* Sections */
+.section { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
+.section.active { display: block; }
+.section-title { font-size: 1.1em; font-weight: 700; margin-bottom: 16px; color: #333; }
+
+/* Help box */
+.help-box { background: #e8f4fd; border-left: 4px solid #667eea; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px; font-size: 0.88em; line-height: 1.6; }
+.help-box strong { color: #667eea; }
+
+/* Buttons */
+.btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-show { background: #e0e0e0; color: #333; }
+.btn-show:hover { background: #d0d0d0; }
+.btn-reset { background: #fff; color: #667eea; border: 2px solid #667eea; }
+.btn-reset:hover { background: #f0f2ff; }
+
+/* ===================== */
+/* TYP 1: LÜCKENÜBUNG   */
+/* ===================== */
+.ex-card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative; }
+.ex-card .badge { display: none; }
+.ex-sentence { font-size: 1.1em; line-height: 2.2; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0; }
+.nowrap-group { display: inline-flex; align-items: baseline; white-space: nowrap; gap: 0; }
+input.blank { border: none; border-bottom: 2px solid #667eea; background: #f8f9ff; padding: 2px 6px; font-size: 1em; font-family: inherit; text-align: center; border-radius: 4px 4px 0 0; outline: none; transition: border-color 0.2s, background 0.2s; }
+input.blank:focus { border-bottom-color: #764ba2; background: #f0f0ff; }
+input.blank.s { min-width: 45px; width: 45px; }
+input.blank.m { min-width: 90px; width: 90px; }
+input.blank.l { min-width: 150px; width: 150px; }
+input.blank.correct { border-bottom-color: #27ae60; background: #eafaf1; }
+input.blank.wrong { border-bottom-color: #e74c3c; background: #fdf2f2; }
+.sol-text { display: none; color: #27ae60; font-weight: 600; font-size: 0.85em; margin-left: 2px; }
+.correction-hint { color: #27ae60; font-weight: 600; font-size: 0.85em; margin-left: 4px; white-space: nowrap; }
+
+/* ===================== */
+/* TYP 2: ZUORDNUNG      */
+/* ===================== */
+.chip-bank { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; padding: 12px; background: #f8f9ff; border-radius: 8px; border: 2px dashed #ccc; margin-bottom: 16px; }
+.chip { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 20px; cursor: grab; font-size: 0.9em; font-weight: 500; user-select: none; transition: transform 0.15s, opacity 0.15s; }
+.chip:active { cursor: grabbing; transform: scale(1.05); }
+.chip.selected { outline: 3px solid #ffd700; }
+.chip.correct { background: linear-gradient(135deg, #27ae60, #2ecc71) !important; }
+.chip.wrong { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
+.categories { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.category { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.category h3 { text-align: center; margin-bottom: 10px; color: #667eea; font-size: 0.95em; }
+.drop-zone { min-height: 60px; padding: 8px; background: #fafbff; border: 2px dashed #ddd; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 6px; transition: border-color 0.2s, background 0.2s; }
+.drop-zone.drag-over { border-color: #667eea; background: #f0f2ff; }
+
+/* ===================== */
+/* TYP 3: SATZBAU        */
+/* ===================== */
+.sb-exercise { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.sb-exercise .sb-label { font-weight: 600; color: #667eea; margin-bottom: 10px; font-size: 0.9em; }
+.chip-bank[data-sb-id] { margin-bottom: 10px; }
+.drop-row { min-height: 48px; padding: 10px 12px; background: #f8f9ff; border: 2px dashed #ccc; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; transition: border-color 0.2s; }
+.drop-row.drag-over { border-color: #667eea; background: #f0f2ff; }
+.drop-row .chip { font-size: 0.85em; }
+.fixed-dot { font-size: 1.2em; font-weight: 700; margin-left: 2px; color: #333; user-select: none; }
+.sb-exercise.correct-row .drop-row { border-color: #27ae60; background: #eafaf1; }
+.sb-exercise.wrong-row .drop-row { border-color: #e74c3c; background: #fdf2f2; }
+
+/* ===================== */
+/* ENTDECKUNG TAB        */
+/* ===================== */
+.discovery-box { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.discovery-box h3 { color: #667eea; font-size: 1em; margin-bottom: 12px; }
+.discovery-box h4 { color: #333; font-size: 0.95em; margin-top: 14px; margin-bottom: 8px; font-weight: 600; }
+.example-list { list-style: none; margin-left: 0; }
+.example-list li { padding: 6px 0; font-size: 0.95em; line-height: 1.6; }
+.example-list li strong { color: #764ba2; }
+.example-list li em { color: #999; font-style: italic; font-size: 0.9em; }
+
+/* ===================== */
+/* KONNEKTOREN-SCHEMA    */
+/* ===================== */
+.schema-block { margin-bottom: 24px; }
+.schema-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.schema-label { font-size: 1.1em; font-weight: 700; color: #1a1a2e; }
+.schema-meaning { font-size: 0.88em; color: #666; font-style: italic; }
+.schema-question { font-size: 0.88em; font-weight: 600; color: #764ba2; }
+.schema-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.schema-box { border-radius: 10px; padding: 12px 10px; min-height: 80px; display: flex; flex-direction: column; }
+.schema-box .box-title { font-size: 0.72em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+.schema-box .box-syntax { font-size: 0.68em; margin-bottom: 8px; opacity: 0.8; }
+.schema-box .box-items { font-size: 0.9em; font-weight: 600; line-height: 1.7; }
+.schema-box .box-items .item-note { font-weight: 400; font-size: 0.78em; opacity: 0.7; }
+.schema-box .box-model { margin-top: 8px; padding: 5px 8px; background: rgba(0,0,0,0.06); border-radius: 6px; font-size: 0.78em; font-family: 'Courier New', monospace; letter-spacing: 0.3px; line-height: 1.5; }
+.schema-box .box-model strong { font-weight: 700; }
+.box-konj { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 2px solid #90caf9; color: #1565c0; }
+.box-konj .box-title { color: #0d47a1; }
+.box-adv { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border: 2px solid #a5d6a7; color: #2e7d32; }
+.box-adv .box-title { color: #1b5e20; }
+.box-subj { background: linear-gradient(135deg, #f3e5f5, #e1bee7); border: 2px solid #ce93d8; color: #6a1b9a; }
+.box-subj .box-title { color: #4a148c; }
+.box-praep { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border: 2px solid #ffcc80; color: #e65100; }
+.box-praep .box-title { color: #bf360c; }
+.schema-box.empty { border-style: dashed; opacity: 0.45; display: flex; align-items: center; justify-content: center; }
+.schema-box.empty .empty-marker { font-size: 1.4em; font-weight: 300; opacity: 0.5; }
+.schema-connector { display: flex; align-items: center; justify-content: center; gap: 10px; margin: -4px 0 -4px 0; padding: 6px 0; }
+.schema-connector .arrow { font-size: 1.1em; color: #764ba2; }
+.schema-connector .connector-text { font-size: 0.82em; color: #764ba2; font-weight: 600; font-style: italic; }
+.legende { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; padding: 10px; background: #f8f9ff; border-radius: 8px; }
+.legende-item { display: flex; align-items: center; gap: 5px; font-size: 0.78em; font-weight: 600; color: #555; }
+.legende-dot { width: 12px; height: 12px; border-radius: 3px; }
+.legende-dot.l-konj { background: #90caf9; }
+.legende-dot.l-adv { background: #a5d6a7; }
+.legende-dot.l-subj { background: #ce93d8; }
+.legende-dot.l-praep { background: #ffcc80; }
+
+/* Responsive */
+
+/* Author Footer */
+.author-footer { margin-top: 40px; padding: 16px 20px; text-align: center; font-size: 0.8em; color: #888; border-top: 1px solid #e0e0e0; }
+.author-footer a { color: #667eea; text-decoration: none; font-weight: 500; }
+.author-footer a:hover { text-decoration: underline; color: #764ba2; }
+.author-footer .author-name { font-weight: 600; color: #555; }
+
+/* Timer */
+.timer-display { display: flex; gap: 14px; font-size: 0.82em; color: #bbb; font-variant-numeric: tabular-nums; }
+.container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+@media (max-width: 600px) {
+    .nav { flex-wrap: wrap; }
+    .nav-btn { flex: 1 1 33%; font-size: 0.78em; padding: 10px 4px; }
+    .nav-btn:last-child { border-right: 1px solid #ddd; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+    <h1>Kausale und konsekutive Konnektoren</h1>
+    <h2>Grund und Folge — zwei Perspektiven auf denselben Sachverhalt — B1</h2>
+</div>
+
+<div class="nav">
+    <div class="nav-btn active" onclick="showSection(0)">📖 Entdeckung</div>
+    <div class="nav-btn" onclick="showSection(1)">🔀 Zuordnung</div>
+    <div class="nav-btn" onclick="showSection(2)">✏️ Lückenübung</div>
+    <div class="nav-btn" onclick="showSection(3)">🧩 Satzbau</div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 0: ENTDECKUNG                        -->
+<!-- ============================================ -->
+<div class="section active" id="sec-0">
+    <div class="section-title">📖 Entdeckung — Grund und Folge</div>
+
+    <div class="discovery-box">
+        <h3>Ein Sachverhalt — zwei Perspektiven</h3>
+        <p style="font-size: 0.95em; line-height: 1.8; margin-bottom: 14px;">
+            <strong style="color: #764ba2;">Ich habe Hunger, <em>deshalb</em> esse ich.</strong><br>
+            <strong style="color: #764ba2;">Ich esse, <em>weil</em> ich Hunger habe.</strong>
+        </p>
+        <p style="font-size: 0.92em; line-height: 1.7; margin-bottom: 12px;">
+            Beide Sätze meinen dasselbe. Es gibt <strong>eine</strong> logische Verbindung zwischen zwei Sachverhalten — aber zwei Erzählrichtungen:
+        </p>
+        <p style="font-size: 0.95em; line-height: 1.7; margin-bottom: 6px;">
+            <strong style="color: #667eea;">Kausal</strong> = der <strong>Grund</strong>. Blick zurück: <em>Warum? Aus welchem Grund?</em>
+        </p>
+        <p style="font-size: 0.95em; line-height: 1.7;">
+            <strong style="color: #667eea;">Konsekutiv</strong> = die <strong>Folge</strong>. Blick nach vorn: <em>Was ist die Konsequenz? Was ergibt sich daraus?</em>
+        </p>
+    </div>
+
+    <div class="discovery-box">
+        <h3>Konnektoren-Schema</h3>
+        <div class="legende">
+            <div class="legende-item"><span class="legende-dot l-konj"></span> Konjunktion (ADUSO)</div>
+            <div class="legende-item"><span class="legende-dot l-adv"></span> Adverb (Inversion)</div>
+            <div class="legende-item"><span class="legende-dot l-subj"></span> Subjunktion (Nebensatz)</div>
+            <div class="legende-item"><span class="legende-dot l-praep"></span> Präposition (+ Kasus)</div>
+        </div>
+
+        <!-- KAUSAL -->
+        <div class="schema-block">
+            <div class="schema-header">
+                <span class="schema-label">KAUSAL</span>
+                <span class="schema-meaning">— der Grund</span>
+                <span class="schema-question">Warum?</span>
+            </div>
+            <div class="schema-grid">
+                <div class="schema-box box-konj">
+                    <div class="box-title">Konjunktion</div>
+                    <div class="box-syntax">HS + HS (Pos. 0)</div>
+                    <div class="box-items">denn</div>
+                    <div class="box-model">HS, <strong>denn</strong> S <strong>V</strong> …</div>
+                </div>
+                <div class="schema-box box-adv">
+                    <div class="box-title">Adverb</div>
+                    <div class="box-syntax">HS (Pos. 1 → Inversion)</div>
+                    <div class="box-items">
+                        nämlich <span class="item-note">(Mittelfeld!)</span>
+                    </div>
+                    <div class="box-model">S <strong>V</strong> <strong>nämlich</strong> …</div>
+                </div>
+                <div class="schema-box box-subj">
+                    <div class="box-title">Subjunktion</div>
+                    <div class="box-syntax">NS (Verb am Ende)</div>
+                    <div class="box-items">weil<br>da</div>
+                    <div class="box-model">HS, <strong>weil</strong> S … <strong>V</strong></div>
+                </div>
+                <div class="schema-box box-praep">
+                    <div class="box-title">Präposition</div>
+                    <div class="box-syntax">+ Genitiv</div>
+                    <div class="box-items">wegen<br>aufgrund</div>
+                    <div class="box-model"><strong>Wegen</strong> + Gen. <strong>V</strong> S …</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="schema-connector">
+            <span class="arrow">⬆</span>
+            <span class="connector-text">derselbe Sachverhalt — andere Blickrichtung</span>
+            <span class="arrow">⬇</span>
+        </div>
+
+        <!-- KONSEKUTIV -->
+        <div class="schema-block">
+            <div class="schema-header">
+                <span class="schema-label">KONSEKUTIV</span>
+                <span class="schema-meaning">— die Folge</span>
+                <span class="schema-question">Was ist die Konsequenz?</span>
+            </div>
+            <div class="schema-grid">
+                <div class="schema-box box-konj empty">
+                    <div class="box-title">Konjunktion</div>
+                    <div class="box-syntax">HS + HS (Pos. 0)</div>
+                    <span class="empty-marker">—</span>
+                </div>
+                <div class="schema-box box-adv">
+                    <div class="box-title">Adverb</div>
+                    <div class="box-syntax">HS (Pos. 1 → Inversion)</div>
+                    <div class="box-items">
+                        deshalb<br>
+                        deswegen<br>
+                        darum<br>
+                        daher<br>
+                        folglich<br>
+                        infolgedessen
+                    </div>
+                    <div class="box-model"><strong>Deshalb</strong> <strong>V</strong> S …</div>
+                </div>
+                <div class="schema-box box-subj">
+                    <div class="box-title">Subjunktion</div>
+                    <div class="box-syntax">NS (Verb am Ende)</div>
+                    <div class="box-items">sodass</div>
+                    <div class="box-model">HS, <strong>sodass</strong> S … <strong>V</strong></div>
+                </div>
+                <div class="schema-box box-praep">
+                    <div class="box-title">Präposition</div>
+                    <div class="box-syntax">+ Genitiv</div>
+                    <div class="box-items">infolge</div>
+                    <div class="box-model"><strong>Infolge</strong> + Gen. <strong>V</strong> S …</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="discovery-box">
+        <h3>Beispiele im Vergleich</h3>
+        <ul class="example-list">
+            <li><strong>weil</strong> (kausal, Subjunktion): Ich bleibe zu Hause, <strong>weil</strong> ich krank bin. <em>(Verb am Ende)</em></li>
+            <li><strong>deshalb</strong> (konsekutiv, Adverb): Ich bin krank. <strong>Deshalb</strong> bleibe ich zu Hause. <em>(Inversion!)</em></li>
+            <li><strong>denn</strong> (kausal, Konjunktion): Ich bleibe zu Hause, <strong>denn</strong> ich bin krank. <em>(normale HS-Wortstellung)</em></li>
+            <li><strong>sodass</strong> (konsekutiv, Subjunktion): Er war so müde, <strong>sodass</strong> er sofort eingeschlafen ist. <em>(Verb am Ende)</em></li>
+            <li><strong>wegen</strong> (kausal, Präposition): <strong>Wegen</strong> meiner Krankheit bleibe ich zu Hause. <em>(+ Genitiv)</em></li>
+            <li><strong>infolge</strong> (konsekutiv, Präposition): <strong>Infolge</strong> des Unfalls war die Straße gesperrt. <em>(+ Genitiv)</em></li>
+        </ul>
+        <p style="font-size: 0.85em; color: #999; margin-top: 10px;">
+            * <strong>nämlich</strong> steht NICHT auf Position 1, sondern im Mittelfeld: <em>Er spricht gut Deutsch. Er hat <strong>nämlich</strong> drei Jahre in Berlin gelebt.</em>
+        </p>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 1: ZUORDNUNG                         -->
+<!-- ============================================ -->
+<div class="section" id="sec-1">
+    <div class="section-title">🔀 Zuordnung — Kausal oder konsekutiv?</div>
+    <div class="help-box">
+        <strong>Kausal</strong> = der Grund. <em>Warum?</em><br>
+        <strong>Konsekutiv</strong> = die Folge. <em>Was ist die Konsequenz?</em><br>
+        Ordne jeden Konnektor der richtigen Kategorie zu.
+    </div>
+    <div class="chip-bank" id="zuo-bank"></div>
+    <div class="categories">
+        <div class="category" data-cat="kausal">
+            <h3>🔍 Kausal (Grund)</h3>
+            <div class="drop-zone" data-cat="kausal"></div>
+        </div>
+        <div class="category" data-cat="konsekutiv">
+            <h3>➡️ Konsekutiv (Folge)</h3>
+            <div class="drop-zone" data-cat="konsekutiv"></div>
+        </div>
+    </div>
+    <div class="btn-row">
+        <button class="btn btn-show" onclick="zuoShow()">👁 Lösungen</button>
+        <button class="btn btn-reset" onclick="zuoReset()">🔄 Neu starten</button>
+    </div>
+    <div class="timer-display"><span class="current-time">⏱️ <span id="timer-1">00:00</span></span><span class="best-time">🏆 Best: <span id="best-1">--:--</span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 2: LÜCKENÜBUNG                       -->
+<!-- ============================================ -->
+<div class="section" id="sec-2">
+    <div class="section-title">✏️ Lückenübung — Konnektoren einsetzen</div>
+    <div class="help-box">
+        Setze den passenden Konnektor ein. Achte auf die <strong>Wortstellung</strong>:<br>
+        <strong>Subjunktion</strong> (weil, da, sodass) → Verb am <strong>Ende</strong><br>
+        <strong>Konjunktion</strong> (denn) → normale HS-Wortstellung<br>
+        <strong>Adverb</strong> (deshalb, deswegen, daher, darum, folglich) → <strong>Inversion</strong>!<br>
+        <strong>Präposition</strong> (wegen, aufgrund, infolge) → + Genitiv, kein Nebensatz
+    </div>
+    <div id="luecke-container"></div>
+    <div class="btn-row">
+        <button class="btn btn-show" onclick="lueckeShow()">👁 Lösungen</button>
+        <button class="btn btn-reset" onclick="lueckeReset()">🔄 Neu starten</button>
+    </div>
+    <div class="timer-display"><span class="current-time">⏱️ <span id="timer-2">00:00</span></span><span class="best-time">🏆 Best: <span id="best-2">--:--</span></span></div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECTION 3: SATZBAU                           -->
+<!-- ============================================ -->
+<div class="section" id="sec-3">
+    <div class="section-title">🧩 Satzbau — Sätze mit Konnektoren bauen</div>
+    <div class="help-box">
+        🔹 <strong>weil / da / sodass</strong> → Nebensatz: Verb am <strong>Ende</strong><br>
+        🔹 <strong>denn</strong> → Konjunktion (Position 0): normale HS-Wortstellung<br>
+        🔹 <strong>deshalb / deswegen / daher / darum / folglich</strong> → Adverb (Position 1): <strong>Inversion</strong>!<br>
+        🔹 <strong>wegen / aufgrund / infolge</strong> + Genitiv → am Satzanfang oder im Mittelfeld<br>
+        🔹 Komma steht <strong>vor</strong> dem Konnektor, wenn ein Nebensatz folgt
+    </div>
+    <div id="sb-container"></div>
+    <div class="btn-row">
+        <button class="btn btn-show" onclick="sbShow()">👁 Lösungen</button>
+        <button class="btn btn-reset" onclick="sbReset()">🔄 Neu starten</button>
+    </div>
+    <div class="timer-display"><span class="current-time">⏱️ <span id="timer-3">00:00</span></span><span class="best-time">🏆 Best: <span id="best-3">--:--</span></span></div>
+</div>
+
+<script>
+/* ========================================= */
+/*  TAB NAVIGATION                           */
+/* ========================================= */
+function showSection(idx) {
+    document.querySelectorAll('.section').forEach((s, i) => s.classList.toggle('active', i === idx));
+    document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+}
+
+/* ========================================= */
+/*  HELPER                                   */
+/* ========================================= */
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function normalize(s) {
+    return s.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+/* ========================================= */
+/*  TIMER SYSTEM                             */
+/* ========================================= */
+const TIMER_PREFIX = 'kausal-konsekutiv-b1';
+const timerState = {
+    1: { running:false, startTime:null, elapsed:0, interval:null },
+    2: { running:false, startTime:null, elapsed:0, interval:null },
+    3: { running:false, startTime:null, elapsed:0, interval:null }
+};
+
+function formatTime(s) {
+    return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+function startTimer(idx) {
+    if (timerState[idx].running) return;
+    timerState[idx].running = true;
+    timerState[idx].startTime = Date.now() - (timerState[idx].elapsed * 1000);
+    timerState[idx].interval = setInterval(() => {
+        timerState[idx].elapsed = Math.floor((Date.now() - timerState[idx].startTime) / 1000);
+        document.getElementById('timer-'+idx).textContent = formatTime(timerState[idx].elapsed);
+    }, 1000);
+}
+
+function stopTimer(idx) {
+    if (!timerState[idx].running) return;
+    clearInterval(timerState[idx].interval);
+    timerState[idx].running = false;
+    const t = timerState[idx].elapsed;
+    const key = TIMER_PREFIX + '-best-' + idx;
+    const prev = localStorage.getItem(key);
+    if (!prev || t < parseInt(prev)) {
+        localStorage.setItem(key, t);
+        document.getElementById('best-'+idx).textContent = formatTime(t);
+    }
+}
+
+function resetTimer(idx) {
+    if (timerState[idx].running) { clearInterval(timerState[idx].interval); timerState[idx].running = false; }
+    timerState[idx].elapsed = 0;
+    timerState[idx].startTime = null;
+    document.getElementById('timer-'+idx).textContent = '00:00';
+}
+
+function loadBestTimes() {
+    for (let i = 1; i <= 3; i++) {
+        const b = localStorage.getItem(TIMER_PREFIX + '-best-' + i);
+        if (b) document.getElementById('best-'+i).textContent = formatTime(parseInt(b));
+    }
+}
+
+function initTimerListeners() {
+    document.querySelectorAll('#zuo-bank .chip, #sec-1 .chip').forEach(chip => {
+        chip.addEventListener('mousedown', () => startTimer(1), { once: true });
+        chip.addEventListener('touchstart', () => startTimer(1), { once: true });
+    });
+    document.querySelectorAll('#sec-2 input.blank').forEach(inp => {
+        inp.addEventListener('focus', () => startTimer(2), { once: true });
+    });
+    document.querySelectorAll('#sec-3 .chip').forEach(chip => {
+        chip.addEventListener('mousedown', () => startTimer(3), { once: true });
+        chip.addEventListener('touchstart', () => startTimer(3), { once: true });
+    });
+}
+
+/* ========================================= */
+/*  LIVE CHECK & AUTO FEEDBACK               */
+/* ========================================= */
+function liveCheck(inp) {
+    var user = inp.value;
+    var answer = inp.dataset.sol || inp.dataset.answer;
+    var field = inp.dataset.field;
+    inp.classList.remove('correct', 'wrong');
+    if (user.length === 0) return;
+    var cmpUser = user;
+    var cmpAnswer = answer;
+    if (field === 'art') { cmpUser = user.toLowerCase(); cmpAnswer = answer.toLowerCase(); }
+    if (cmpUser === cmpAnswer) { inp.classList.add('correct'); }
+    else if (cmpAnswer.indexOf(cmpUser) === 0) { /* prefix */ }
+    else { inp.classList.add('wrong'); }
+}
+
+function checkAllInputs(secSelector, timerIdx) {
+    var inputs = document.querySelectorAll(secSelector);
+    var allCorrect = inputs.length > 0;
+    inputs.forEach(function(inp) {
+        if (!inp.classList.contains('correct')) allCorrect = false;
+    });
+    if (allCorrect) stopTimer(timerIdx);
+}
+
+/* ========================================= */
+/*  SECTION 1: ZUORDNUNG                     */
+/* ========================================= */
+const ZUO_ITEMS = [
+    { word: "weil", cat: "kausal" },
+    { word: "da", cat: "kausal" },
+    { word: "denn", cat: "kausal" },
+    { word: "wegen + Gen.", cat: "kausal" },
+    { word: "aufgrund + Gen.", cat: "kausal" },
+    { word: "n\u00e4mlich", cat: "kausal" },
+    { word: "deshalb", cat: "konsekutiv" },
+    { word: "deswegen", cat: "konsekutiv" },
+    { word: "darum", cat: "konsekutiv" },
+    { word: "daher", cat: "konsekutiv" },
+    { word: "folglich", cat: "konsekutiv" },
+    { word: "infolgedessen", cat: "konsekutiv" },
+    { word: "sodass", cat: "konsekutiv" },
+    { word: "infolge + Gen.", cat: "konsekutiv" },
+];
+
+let zuoSelected = null;
+
+function zuoInit() {
+    const bank = document.getElementById('zuo-bank');
+    bank.innerHTML = '';
+    document.querySelectorAll('#sec-1 .drop-zone').forEach(z => z.innerHTML = '');
+
+    shuffle(ZUO_ITEMS).forEach((item, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = item.word;
+        chip.dataset.cat = item.cat;
+        chip.draggable = true;
+        chip.id = 'zuo-chip-' + i;
+
+        chip.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', chip.id);
+            chip.style.opacity = '0.5';
+        });
+        chip.addEventListener('dragend', () => chip.style.opacity = '1');
+
+        chip.addEventListener('click', () => {
+            if (zuoSelected === chip) {
+                chip.classList.remove('selected');
+                zuoSelected = null;
+            } else {
+                if (zuoSelected) zuoSelected.classList.remove('selected');
+                zuoSelected = chip;
+                chip.classList.add('selected');
+            }
+        });
+
+        bank.appendChild(chip);
+    });
+
+    document.querySelectorAll('#sec-1 .drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+        zone.addEventListener('drop', e => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            const chip = document.getElementById(id);
+            if (chip) {
+                zone.appendChild(chip);
+                chip.classList.remove('correct', 'wrong');
+                if (chip.dataset.cat === zone.dataset.cat) {
+                    chip.classList.add('correct');
+                } else {
+                    chip.classList.add('wrong');
+                }
+            }
+        });
+        zone.addEventListener('click', () => {
+            if (zuoSelected) {
+                zone.appendChild(zuoSelected);
+                zuoSelected.classList.remove('correct', 'wrong');
+                if (zuoSelected.dataset.cat === zone.dataset.cat) {
+                    zuoSelected.classList.add('correct');
+                } else {
+                    zuoSelected.classList.add('wrong');
+                }
+                zuoSelected.classList.remove('selected');
+                zuoSelected = null;
+            }
+        });
+    });
+
+    bank.addEventListener('dragover', e => { e.preventDefault(); bank.classList.add('drag-over'); });
+    bank.addEventListener('dragleave', () => bank.classList.remove('drag-over'));
+    bank.addEventListener('drop', e => {
+        e.preventDefault();
+        bank.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        const chip = document.getElementById(id);
+        if (chip) {
+            bank.appendChild(chip);
+            chip.classList.remove('correct', 'wrong');
+        }
+    });
+    bank.addEventListener('click', () => {
+        if (zuoSelected && !bank.contains(zuoSelected)) {
+            bank.appendChild(zuoSelected);
+            zuoSelected.classList.remove('correct', 'wrong');
+            zuoSelected.classList.remove('selected');
+            zuoSelected = null;
+        }
+    });
+}
+
+function zuoShow() {
+    document.querySelectorAll('#sec-1 .chip').forEach(chip => {
+        const zone = document.querySelector(`#sec-1 .drop-zone[data-cat="${chip.dataset.cat}"]`);
+        zone.appendChild(chip);
+        chip.classList.remove('wrong', 'selected');
+        chip.classList.add('correct');
+    });
+}
+
+function zuoReset() {
+    resetTimer(1);
+    zuoSelected = null;
+    zuoInit();
+    initTimerListeners();
+}
+
+/* ========================================= */
+/*  SECTION 2: LÜCKENÜBUNG                   */
+/* ========================================= */
+const LUECKEN = [
+    {
+        id: 1, verb: "kausal",
+        segments: [
+            {t: "Ich lerne Deutsch, "},
+            {b: "weil", s: "m"},
+            {t: " ich in Deutschland arbeiten m\u00f6chte."}
+        ]
+    },
+    {
+        id: 2, verb: "konsekutiv",
+        segments: [
+            {t: "Sie war m\u00fcde. "},
+            {b: "Deshalb", s: "l"},
+            {t: " ist sie fr\u00fch ins Bett gegangen."}
+        ]
+    },
+    {
+        id: 3, verb: "kausal",
+        segments: [
+            {t: "Er kann nicht kommen, "},
+            {b: "denn", s: "m"},
+            {t: " er hat keine Zeit."}
+        ]
+    },
+    {
+        id: 4, verb: "konsekutiv",
+        segments: [
+            {t: "Es hat stark geregnet, "},
+            {b: "sodass", s: "m"},
+            {t: " die Stra\u00dfen \u00fcberflutet waren."}
+        ]
+    },
+    {
+        id: 5, verb: "kausal",
+        segments: [
+            {t: "Sie hat den Job bekommen, "},
+            {b: "da", s: "s"},
+            {t: " sie die beste Bewerbung hatte."}
+        ]
+    },
+    {
+        id: 6, verb: "konsekutiv",
+        segments: [
+            {t: "Der Zug hatte Versp\u00e4tung. "},
+            {b: "Daher", s: "m"},
+            {t: " bin ich zu sp\u00e4t gekommen."}
+        ]
+    },
+    {
+        id: 7, verb: "kausal",
+        segments: [
+            {b: "Wegen", s: "m"},
+            {t: " des schlechten Wetters bleiben wir zu Hause."}
+        ]
+    },
+    {
+        id: 8, verb: "konsekutiv",
+        segments: [
+            {t: "Er hat nicht gelernt. "},
+            {b: "Folglich", s: "l"},
+            {t: " hat er die Pr\u00fcfung nicht bestanden."}
+        ]
+    },
+    {
+        id: 9, verb: "kausal",
+        segments: [
+            {t: "Er spricht gut Deutsch. Er hat "},
+            {b: "n\u00e4mlich", s: "l"},
+            {t: " drei Jahre in Berlin gelebt."}
+        ]
+    },
+    {
+        id: 10, verb: "konsekutiv",
+        segments: [
+            {t: "Sie hat viel ge\u00fcbt. "},
+            {b: "Deswegen", s: "l"},
+            {t: " hat sie die Pr\u00fcfung bestanden."}
+        ]
+    },
+    {
+        id: 11, verb: "kausal",
+        segments: [
+            {b: "Aufgrund", s: "l"},
+            {t: " eines Unfalls war die Stra\u00dfe gesperrt."}
+        ]
+    },
+    {
+        id: 12, verb: "konsekutiv",
+        segments: [
+            {t: "Es gab einen Unfall. "},
+            {b: "Infolgedessen", s: "l"},
+            {t: " war die Stra\u00dfe gesperrt."}
+        ]
+    },
+    {
+        id: 13, verb: "konsekutiv",
+        segments: [
+            {t: "Er war so laut, "},
+            {b: "sodass", s: "m"},
+            {t: " sich alle Nachbarn beschwert haben."}
+        ]
+    },
+    {
+        id: 14, verb: "kausal",
+        segments: [
+            {t: "Wir fahren mit dem Zug, "},
+            {b: "weil", s: "m"},
+            {t: " das billiger ist."}
+        ]
+    },
+    {
+        id: 15, verb: "konsekutiv",
+        segments: [
+            {t: "Die Mieten sind gestiegen. "},
+            {b: "Darum", s: "m"},
+            {t: " suchen viele Leute eine neue Wohnung."}
+        ]
+    },
+    {
+        id: 16, verb: "konsekutiv",
+        segments: [
+            {b: "Infolge", s: "m"},
+            {t: " der Pandemie haben viele ihren Job verloren."}
+        ]
+    },
+    {
+        id: 17, verb: "kausal",
+        segments: [
+            {t: "Der Laden hat geschlossen, "},
+            {b: "denn", s: "m"},
+            {t: " heute ist Feiertag."}
+        ]
+    },
+    {
+        id: 18, verb: "konsekutiv",
+        segments: [
+            {t: "Heute ist Feiertag. "},
+            {b: "Deshalb", s: "l"},
+            {t: " hat der Laden geschlossen."}
+        ]
+    },
+    {
+        id: 19, verb: "kausal",
+        segments: [
+            {t: "Sie ist umgezogen, "},
+            {b: "da", s: "s"},
+            {t: " ihre Wohnung zu klein war."}
+        ]
+    },
+    {
+        id: 20, verb: "konsekutiv",
+        segments: [
+            {t: "Ihre Wohnung war zu klein. "},
+            {b: "Folglich", s: "l"},
+            {t: " ist sie umgezogen."}
+        ]
+    }
+];
+
+function lueckeInit() {
+    const c = document.getElementById('luecke-container');
+    c.innerHTML = '';
+    LUECKEN.forEach(ex => {
+        const card = document.createElement('div');
+        card.className = 'ex-card';
+
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = ex.verb;
+        card.appendChild(badge);
+
+        const sentence = document.createElement('div');
+        sentence.className = 'ex-sentence';
+
+        let blankIdx = 0;
+        for (let i = 0; i < ex.segments.length; i++) {
+            const seg = ex.segments[i];
+            if (seg.t !== undefined) {
+                const endsNoSpace = seg.t.length > 0 && !seg.t.endsWith(' ') && i + 1 < ex.segments.length && ex.segments[i + 1].b !== undefined;
+                if (endsNoSpace) {
+                    const group = document.createElement('span');
+                    group.className = 'nowrap-group';
+                    const txt = document.createElement('span');
+                    txt.textContent = seg.t;
+                    group.appendChild(txt);
+                    i++;
+                    const nextSeg = ex.segments[i];
+                    const currentBlankIdx = blankIdx;
+                    const inp = document.createElement('input');
+                    inp.type = 'text';
+                    inp.className = 'blank ' + nextSeg.s;
+                    inp.dataset.exId = ex.id;
+                    inp.dataset.blankIdx = currentBlankIdx;
+                    inp.dataset.sol = nextSeg.b;
+                    inp.dataset.answer = nextSeg.b;
+                    inp.autocomplete = 'off';
+                    inp.spellcheck = false;
+                    inp.oninput = function() { liveCheck(this); checkAllInputs('#luecke-container input.blank', 2); };
+                    group.appendChild(inp);
+                    sentence.appendChild(group);
+                    blankIdx++;
+                } else {
+                    const txt = document.createElement('span');
+                    txt.textContent = seg.t;
+                    sentence.appendChild(txt);
+                }
+            } else if (seg.b !== undefined) {
+                const currentBlankIdx = blankIdx;
+                const inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'blank ' + seg.s;
+                inp.dataset.exId = ex.id;
+                inp.dataset.blankIdx = currentBlankIdx;
+                inp.dataset.sol = seg.b;
+                inp.dataset.answer = seg.b;
+                inp.autocomplete = 'off';
+                inp.spellcheck = false;
+                inp.oninput = function() { liveCheck(this); checkAllInputs('#luecke-container input.blank', 2); };
+                sentence.appendChild(inp);
+                blankIdx++;
+            }
+        }
+
+        card.appendChild(sentence);
+        c.appendChild(card);
+    });
+}
+
+function lueckeShow() {
+    document.querySelectorAll('#luecke-container input.blank').forEach(inp => {
+        const user = normalize(inp.value);
+        const answer = normalize(inp.dataset.sol);
+        const next = inp.nextElementSibling;
+        if (next && next.classList.contains('correction-hint')) next.remove();
+        if (user === answer) {
+            inp.classList.remove('wrong');
+            inp.classList.add('correct');
+        } else {
+            inp.classList.add('wrong');
+            const hint = document.createElement('span');
+            hint.className = 'correction-hint';
+            hint.textContent = inp.dataset.sol;
+            inp.insertAdjacentElement('afterend', hint);
+        }
+    });
+}
+
+function lueckeReset() {
+    resetTimer(2);
+    document.querySelectorAll('#luecke-container input.blank').forEach(inp => {
+        inp.value = '';
+        inp.classList.remove('correct', 'wrong');
+        const next = inp.nextElementSibling;
+        if (next && next.classList.contains('correction-hint')) next.remove();
+    });
+    initTimerListeners();
+}
+
+/* ========================================= */
+/*  SECTION 3: SATZBAU                       */
+/* ========================================= */
+const SATZBAU = [
+    {
+        id: 1, hint: "kausal (weil) — Nebensatz",
+        parts: ["ich", "lerne", "Deutsch", ",", "weil", "ich", "in Berlin", "arbeiten", "m\u00f6chte"],
+        valid: [["ich", "lerne", "Deutsch", ",", "weil", "ich", "in Berlin", "arbeiten", "m\u00f6chte"]]
+    },
+    {
+        id: 2, hint: "konsekutiv (deshalb) — Adverb + Inversion",
+        parts: ["er", "war", "krank", "deshalb", "ist", "er", "zu Hause", "geblieben"],
+        valid: [["er", "war", "krank", "deshalb", "ist", "er", "zu Hause", "geblieben"]]
+    },
+    {
+        id: 3, hint: "kausal (denn) — Konjunktion",
+        parts: ["sie", "kauft", "ein Fahrrad", ",", "denn", "sie", "braucht", "mehr Bewegung"],
+        valid: [["sie", "kauft", "ein Fahrrad", ",", "denn", "sie", "braucht", "mehr Bewegung"]]
+    },
+    {
+        id: 4, hint: "konsekutiv (sodass) — Nebensatz",
+        parts: ["es", "hat", "so stark", "geregnet", ",", "sodass", "die Stra\u00dfen", "\u00fcberflutet", "waren"],
+        valid: [["es", "hat", "so stark", "geregnet", ",", "sodass", "die Stra\u00dfen", "\u00fcberflutet", "waren"]]
+    },
+    {
+        id: 5, hint: "kausal (da) — Nebensatz vorn",
+        parts: ["da", "er", "kein Geld", "hat", ",", "kann", "er", "nicht", "in Urlaub", "fahren"],
+        valid: [["da", "er", "kein Geld", "hat", ",", "kann", "er", "nicht", "in Urlaub", "fahren"]]
+    },
+    {
+        id: 6, hint: "konsekutiv (folglich) — Adverb + Inversion",
+        parts: ["er", "hat", "nicht", "gelernt", "folglich", "hat", "er", "die Pr\u00fcfung", "nicht bestanden"],
+        valid: [["er", "hat", "nicht", "gelernt", "folglich", "hat", "er", "die Pr\u00fcfung", "nicht bestanden"]]
+    },
+    {
+        id: 7, hint: "kausal (wegen + Gen.) — Pr\u00e4position",
+        parts: ["wegen", "des Staus", "kommt", "er", "zu sp\u00e4t"],
+        valid: [
+            ["wegen", "des Staus", "kommt", "er", "zu sp\u00e4t"],
+            ["er", "kommt", "wegen", "des Staus", "zu sp\u00e4t"]
+        ]
+    },
+    {
+        id: 8, hint: "konsekutiv (infolge + Gen.) — Pr\u00e4position",
+        parts: ["infolge", "der Pandemie", "haben", "viele Menschen", "ihren Job", "verloren"],
+        valid: [
+            ["infolge", "der Pandemie", "haben", "viele Menschen", "ihren Job", "verloren"],
+            ["viele Menschen", "haben", "infolge", "der Pandemie", "ihren Job", "verloren"]
+        ]
+    },
+    {
+        id: 9, hint: "konsekutiv (darum) — Adverb + Inversion",
+        parts: ["die Mieten", "sind", "gestiegen", "darum", "suchen", "viele", "eine neue Wohnung"],
+        valid: [["die Mieten", "sind", "gestiegen", "darum", "suchen", "viele", "eine neue Wohnung"]]
+    },
+    {
+        id: 10, hint: "kausal (n\u00e4mlich) — Adverb im Mittelfeld",
+        parts: ["er", "spricht", "gut Deutsch", "er", "hat", "n\u00e4mlich", "lange", "in Berlin", "gelebt"],
+        valid: [["er", "spricht", "gut Deutsch", "er", "hat", "n\u00e4mlich", "lange", "in Berlin", "gelebt"]]
+    }
+];
+
+let sbSelected = null;
+
+function checkSatzbauAuto() {
+    SATZBAU.forEach(ex => {
+        const row = document.querySelector(`.drop-row[data-sb-id="${ex.id}"]`);
+        const wrapper = document.querySelector(`.sb-exercise[data-sb-id="${ex.id}"]`);
+        const chips = [...row.querySelectorAll('.chip')];
+        const answer = chips.map(c => c.dataset.orig);
+        const ok = ex.valid.some(v => v.length === answer.length && v.every((w, i) => w === answer[i]));
+        wrapper.classList.remove('correct-row', 'wrong-row');
+        wrapper.classList.add(ok ? 'correct-row' : 'wrong-row');
+    });
+}
+
+function sbInit() {
+    const c = document.getElementById('sb-container');
+    c.innerHTML = '';
+    SATZBAU.forEach(ex => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'sb-exercise';
+        wrapper.dataset.sbId = ex.id;
+
+        const label = document.createElement('div');
+        label.className = 'sb-label';
+        label.textContent = ex.hint || ('Satz ' + ex.id);
+        wrapper.appendChild(label);
+
+        const bank = document.createElement('div');
+        bank.className = 'chip-bank';
+        bank.dataset.sbId = ex.id;
+
+        shuffle(ex.parts).forEach((part, i) => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.textContent = part;
+            chip.dataset.orig = part;
+            chip.dataset.sbId = ex.id;
+            chip.draggable = true;
+            chip.id = `sb-chip-${ex.id}-${i}`;
+
+            chip.addEventListener('dragstart', e => {
+                e.dataTransfer.setData('text/plain', chip.id);
+                chip.style.opacity = '0.5';
+            });
+            chip.addEventListener('dragend', () => chip.style.opacity = '1');
+            chip.addEventListener('click', () => sbChipClick(chip, ex.id));
+
+            bank.appendChild(chip);
+        });
+        wrapper.appendChild(bank);
+
+        const row = document.createElement('div');
+        row.className = 'drop-row';
+        row.dataset.sbId = ex.id;
+
+        const dot = document.createElement('span');
+        dot.className = 'fixed-dot';
+        dot.textContent = '.';
+        row.appendChild(dot);
+
+        row.addEventListener('dragover', e => { e.preventDefault(); row.classList.add('drag-over'); });
+        row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+        row.addEventListener('drop', e => {
+            e.preventDefault();
+            row.classList.remove('drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            const chip = document.getElementById(id);
+            if (!chip) return;
+            const chips = [...row.querySelectorAll('.chip')];
+            let inserted = false;
+            for (const ch of chips) {
+                if (ch === chip) continue;
+                const rect = ch.getBoundingClientRect();
+                if (e.clientX < rect.left + rect.width / 2) {
+                    row.insertBefore(chip, ch);
+                    inserted = true;
+                    break;
+                }
+            }
+            if (!inserted) row.insertBefore(chip, dot);
+            updateCaps(ex.id);
+            checkSatzbauAuto();
+        });
+
+        row.addEventListener('click', e => {
+            if (sbSelected && sbSelected.dataset.sbId == ex.id && e.target === row) {
+                row.insertBefore(sbSelected, dot);
+                sbSelected.classList.remove('selected');
+                sbSelected = null;
+                updateCaps(ex.id);
+                checkSatzbauAuto();
+            }
+        });
+
+        wrapper.appendChild(row);
+
+        bank.addEventListener('dragover', e => { e.preventDefault(); bank.classList.add('drag-over'); });
+        bank.addEventListener('dragleave', () => bank.classList.remove('drag-over'));
+        bank.addEventListener('drop', e => {
+            e.preventDefault();
+            bank.classList.remove('drag-over');
+            const id = e.dataTransfer.getData('text/plain');
+            const chip = document.getElementById(id);
+            if (chip) {
+                bank.appendChild(chip);
+                updateCaps(ex.id);
+                checkSatzbauAuto();
+            }
+        });
+
+        c.appendChild(wrapper);
+    });
+}
+
+function sbChipClick(chip, exId) {
+    const row = document.querySelector(`.drop-row[data-sb-id="${exId}"]`);
+    const bank = document.querySelector(`.chip-bank[data-sb-id="${exId}"]`);
+    const dot = row.querySelector('.fixed-dot');
+
+    if (sbSelected === chip) {
+        chip.classList.remove('selected');
+        sbSelected = null;
+        return;
+    }
+
+    if (sbSelected && sbSelected.dataset.sbId == exId) {
+        if (row.contains(sbSelected) && row.contains(chip)) {
+            row.insertBefore(sbSelected, chip);
+            sbSelected.classList.remove('selected');
+            sbSelected = null;
+            updateCaps(exId);
+            checkSatzbauAuto();
+            return;
+        }
+        sbSelected.classList.remove('selected');
+    }
+
+    if (bank.contains(chip)) {
+        row.insertBefore(chip, dot);
+        updateCaps(exId);
+        checkSatzbauAuto();
+        sbSelected = null;
+        return;
+    }
+
+    if (row.contains(chip)) {
+        sbSelected = chip;
+        chip.classList.add('selected');
+    }
+}
+
+function updateCaps(exId) {
+    const row = document.querySelector(`.drop-row[data-sb-id="${exId}"]`);
+    const bank = document.querySelector(`.chip-bank[data-sb-id="${exId}"]`);
+    [...row.querySelectorAll('.chip'), ...bank.querySelectorAll('.chip')].forEach(c => {
+        if (c.dataset.orig) c.textContent = c.dataset.orig;
+    });
+    const first = row.querySelector('.chip');
+    if (first && first.textContent !== '.')
+        first.textContent = first.textContent.charAt(0).toUpperCase() + first.textContent.slice(1);
+}
+
+function sbShow() {
+    SATZBAU.forEach(ex => {
+        const row = document.querySelector(`.drop-row[data-sb-id="${ex.id}"]`);
+        const bank = document.querySelector(`.chip-bank[data-sb-id="${ex.id}"]`);
+        const wrapper = document.querySelector(`.sb-exercise[data-sb-id="${ex.id}"]`);
+        const dot = row.querySelector('.fixed-dot');
+        const allChips = [...row.querySelectorAll('.chip'), ...bank.querySelectorAll('.chip')];
+
+        ex.valid[0].forEach(part => {
+            const chip = allChips.find(c => c.dataset.orig === part);
+            if (chip) row.insertBefore(chip, dot);
+        });
+
+        wrapper.classList.remove('wrong-row');
+        wrapper.classList.add('correct-row');
+        updateCaps(ex.id);
+    });
+}
+
+function sbReset() {
+    resetTimer(3);
+    sbSelected = null;
+    sbInit();
+    document.querySelectorAll('.sb-exercise').forEach(w => w.classList.remove('correct-row', 'wrong-row'));
+    initTimerListeners();
+}
+
+/* ========================================= */
+/*  INIT                                     */
+/* ========================================= */
+zuoInit();
+lueckeInit();
+sbInit();
+loadBestTimes();
+initTimerListeners();
+</script>
+<div class="author-footer">
+    <span class="author-name">&copy; Frank Burkert</span> &middot; DaF-Materialien &middot; <a href="mailto:FrankBurkert@fabdaf.onmicrosoft.com">FrankBurkert@fabdaf.onmicrosoft.com</a>
+</div>
+</div>
+</body>
+</html>
