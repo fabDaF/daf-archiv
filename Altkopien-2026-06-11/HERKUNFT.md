@@ -10,3 +10,7 @@ Im Zuge des Gerüst-Vollständigkeits-Scans archivierte Parallelkopien:
   B2-Root; kanonisch ist `DE_B2_GEHIRN_05G-nominalisierung-verbalisierung.html`.
 - `DE_B2_Eskalationsfalle-Iran.html`: nirgends verlinkte Parallelkopie aus
   `htmlS/A2.1`; kanonisch ist die gepatchte Version in `daf-materialien`.
+
+- `B1_werden_Tabelle.html` (2026-06-11, B1.1-Repo): Fragment ohne <body> —
+  CSS+JS-Dump ohne HTML-Struktur, nie funktionsfähig, nirgends verlinkt.
+  Funktionierendes Pendant: `B1_werden_Uebungen.html` (migriert + Gerüst).
