@@ -1,0 +1,36 @@
+name: Codeberg Deploy-Key einrichten (einmalig)
+
+# Traegt den oeffentlichen SSH-Schluessel des Mac-Autopush (scripts/autopush.sh,
+# Codeberg-Direktspiegel) als Deploy Key MIT Schreibrecht in alle Mirror-Repos
+# auf codeberg.org/fabbuLos ein. Idempotent: vorhandene Keys werden uebersprungen.
+# Der Schluessel ist oeffentlich; der private Teil liegt nur auf Franks Mac.
+
+on:
+  push:
+    paths: ['.github/workflows/codeberg-deploykey.yml']
+  workflow_dispatch:
+
+jobs:
+  deploykey:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy Key eintragen
+        env:
+          CB_USER: ${{ secrets.CODEBERG_USERNAME }}
+          CB_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
+          KEY: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBzSAxKCK2Y9AU+/PVw/aiesfCyp/0H94I4NYtc2jUyy fabdaf-autopush-mac"
+        run: |
+          set -u
+          fail=0
+          KEYBODY=$(echo "$KEY" | awk '{print $2}')
+          for r in daf-a1-uebungen daf-a2-uebungen daf-b1-uebungen daf-b2-uebungen daf-c1-uebungen daf-materialien daf-architektur daf-lueckentexte daf-archiv daf-vertragssprache-uebungen; do
+            api="https://codeberg.org/api/v1/repos/$CB_USER/$r/keys"
+            if curl -s -H "Authorization: token $CB_TOKEN" "$api" | grep -qF "$KEYBODY"; then
+              echo "$r: schon vorhanden"; continue
+            fi
+            body=$(jq -nc --arg k "$KEY" '{title:"fabdaf-autopush-mac", key:$k, read_only:false}')
+            code=$(curl -s -o resp.json -w '%{http_code}' -X POST -H "Authorization: token $CB_TOKEN" -H 'Content-Type: application/json' -d "$body" "$api")
+            echo "$r: HTTP $code $(head -c 200 resp.json)"
+            [ "$code" = "201" ] || fail=1
+          done
+          exit $fail
